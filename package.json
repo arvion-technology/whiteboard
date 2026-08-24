@@ -1,0 +1,19 @@
+{
+  "name": "whiteboard",
+  "version": "1.0.0",
+  "description": "An infinite canvas whiteboard: pan and zoom, shapes, sticky notes, connectors, multi-select, undo/redo and simulated multiplayer cursors.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "author": "Arvion Technologies <hello@arviontech.net> (https://arviontech.net)",
+  "homepage": "https://arvion-technology.github.io/labs/demos/whiteboard/",
+  "repository": { "type": "git", "url": "git+https://github.com/arvion-technology/whiteboard.git" },
+  "scripts": {
+    "test": "node --test",
+    "demo": "node scripts/serve.mjs . 4173",
+    "shot": "node scripts/shot.mjs 1440 900 docs/screenshot.png",
+    "shot:2": "node scripts/shot.mjs 1440 900 docs/screenshot-2.png #flow",
+    "verify": "node --test test/ && node scripts/serve-check.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
