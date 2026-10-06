@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en" class="theme-violet">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Canvas — infinite collaborative whiteboard</title>
+  <meta name="description" content="An infinite board on Canvas 2D: pan and zoom, shapes, sticky notes, connectors, multi-select, undo/redo, a simulated live cursor, and real PNG/SVG export." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23100a1c'/><text x='16' y='22' font-family='sans-serif' font-size='16' font-weight='700' fill='%23b28bff' text-anchor='middle'>A</text></svg>" />
+  <link rel="stylesheet" href="arvion.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="grid-lines"></div>
+
+  <div class="app">
+    <header class="topbar board-topbar">
+      <a class="brand" href="./index.html" aria-label="Canvas home">
+        <span class="brand-mark">A</span>
+        <span>
+          <span class="brand-word">ARVION <b>/</b> CANVAS</span>
+          <span class="brand-sub" style="display:block">Collaborative whiteboard</span>
+        </span>
+      </a>
+
+      <span class="top-divider"></span>
+
+      <div class="board-id">
+        <span class="board-title" id="board-title">Q4 checkout teardown</span>
+        <span class="badge green saved-badge" id="saved-state"><span class="dot pulse"></span> saved</span>
+      </div>
+
+      <span class="spacer"></span>
+
+      <div class="presence-mini" aria-label="Collaborators online">
+        <div class="stack">
+          <span class="avatar lilac" title="You">AR</span>
+          <span class="avatar pink" title="Nyx, simulated peer">NY</span>
+        </div>
+        <span class="online">2 online</span>
+      </div>
+
+      <span class="top-divider"></span>
+
+      <button class="btn icon ghost" id="undo" title="Undo (Ctrl/Cmd + Z)" aria-label="Undo" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
+      </button>
+      <button class="btn icon ghost" id="redo" title="Redo (Ctrl/Cmd + Shift + Z)" aria-label="Redo" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg>
+      </button>
+
+      <span class="top-divider"></span>
+
+      <button class="btn sm" id="export-svg" title="Download the whole board as a standalone SVG">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m8 11 4 4 4-4"/><path d="M5 19h14"/></svg>
+        Export SVG
+      </button>
+      <button class="btn primary sm" id="export-png" title="Download a 2x PNG of the whole board">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.3"/><path d="m4.5 17 4.5-4.5 3.5 3.5 2-2 4 4"/></svg>
+        Export PNG
+      </button>
+
+      <div class="avatar lilac" title="You">AR</div>
+    </header>
+
+    <div class="workspace">
+      <section class="board-card" id="board-card" aria-label="Infinite whiteboard">
+        <canvas id="board" tabindex="0" aria-label="Whiteboard canvas. Arrow keys nudge the selection; Space and drag pans."></canvas>
+
+        <div class="tool-dock" role="toolbar" aria-label="Board tools">
+          <button class="tool active" data-tool="select" data-tip="Select · V" aria-label="Select tool" aria-pressed="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5 19 11l-6.2 1.6L9.6 19z"/></svg>
+          </button>
+          <button class="tool" data-tool="hand" data-tip="Pan · H" aria-label="Pan tool">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5.6a1.4 1.4 0 0 1 2.8 0V11"/><path d="M11.8 10.6V4.8a1.4 1.4 0 0 1 2.8 0v5.8"/><path d="M14.6 10.6V6.4a1.4 1.4 0 0 1 2.8 0v6.9c0 3.9-2.2 6.7-6.1 6.7-2.3 0-3.7-.9-4.8-2.4L5 14.6a1.5 1.5 0 0 1 2.3-1.9L9 14.5"/></svg>
+          </button>
+
+          <span class="tool-divider" aria-hidden="true"></span>
+
+          <button class="tool" data-tool="rect" data-tip="Rectangle · R" aria-label="Rectangle tool">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="13" rx="2"/></svg>
+          </button>
+          <button class="tool" data-tool="ellipse" data-tip="Ellipse · O" aria-label="Ellipse tool">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="8" ry="6.5"/></svg>
+          </button>
+          <button class="tool" data-tool="sticky" data-tip="Sticky note · S" aria-label="Sticky note tool">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h14v8.6L14.4 19H5z"/><path d="M14.4 19v-5.4H19"/></svg>
+          </button>
+          <button class="tool" data-tool="text" data-tip="Text · T" aria-label="Text tool">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6.5v-2h14v2"/><path d="M12 4.5V19"/><path d="M8.5 19h7"/></svg>
+          </button>
+          <button class="tool" data-tool="connector" data-tip="Connector · C" aria-label="Connector tool">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.3" cy="18.7" r="2.1"/><circle cx="18.7" cy="5.3" r="2.1"/><path d="M7.2 17.1c4.7-.4 7-3.6 8.4-7.4"/><path d="M12.4 8.4l1.7-2.6 2.7 1.7"/></svg>
+          </button>
+        </div>
+
+        <div class="minimap-wrap">
+          <div class="minimap-head"><span>Board map</span><span class="mono" id="minimap-zoom">100%</span></div>
+          <canvas id="minimap" width="188" height="118" aria-label="Minimap of the board"></canvas>
+        </div>
+
+        <div class="zoom-dock">
+          <button class="zoom-btn" id="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
+          <button class="zoom-btn zoom-value" id="zoom-reset" title="Reset zoom to 100%">100%</button>
+          <button class="zoom-btn" id="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
+          <span class="zoom-sep" aria-hidden="true"></span>
+          <button class="zoom-btn fit" id="zoom-fit" title="Fit the board in the viewport">fit</button>
+        </div>
+
+        <div class="canvas-hint" id="hint">
+          <kbd>Space</kbd> drag to pan <span class="sep">·</span> <kbd>Scroll</kbd> zoom
+          <span class="sep">·</span> <kbd>V</kbd> select
+        </div>
+      </section>
+
+      <aside class="side-rail">
+        <section class="card rail-card" id="inspector" aria-label="Board and selection inspector"></section>
+
+        <section class="card rail-card presence-card" aria-label="Presence">
+          <div class="rail-head">
+            <div>
+              <div class="eyebrow">Presence</div>
+              <h3>In this board</h3>
+            </div>
+            <span class="badge green"><span class="dot pulse"></span>2 online</span>
+          </div>
+          <div class="person">
+            <span class="avatar lilac">AR</span>
+            <div class="person-meta"><b>You</b><span>editing · select tool</span></div>
+          </div>
+          <div class="person">
+            <span class="avatar pink">NY</span>
+            <div class="person-meta"><b>Nyx</b><span id="peer-status">reviewing the board</span></div>
+            <span class="badge tiny">simulated</span>
+          </div>
+        </section>
+
+        <section class="card rail-card activity-card" aria-label="Recent activity">
+          <div class="rail-head">
+            <div>
+              <div class="eyebrow">Activity</div>
+              <h3>Recent changes</h3>
+            </div>
+            <span class="mono small muted" id="activity-count">3</span>
+          </div>
+          <div class="activity-list" id="activity-list"></div>
+        </section>
+
+        <section class="card rail-card" aria-label="Keyboard shortcuts">
+          <div class="rail-head">
+            <div>
+              <div class="eyebrow">Keyboard</div>
+              <h3>Shortcuts</h3>
+            </div>
+          </div>
+          <div class="key-grid">
+            <span><kbd>V</kbd> select</span>
+            <span><kbd>R</kbd> rectangle</span>
+            <span><kbd>O</kbd> ellipse</span>
+            <span><kbd>S</kbd> sticky</span>
+            <span><kbd>T</kbd> text</span>
+            <span><kbd>C</kbd> connector</span>
+            <span><kbd>Space</kbd> pan</span>
+            <span><kbd>⌘Z</kbd> undo</span>
+            <span><kbd>⌘D</kbd> duplicate</span>
+            <span><kbd>Del</kbd> delete</span>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <div class="demo-banner">
+    <span class="brand-mark" style="width:20px;height:20px;font-size:10px;border-radius:6px">A</span>
+    <span>Arvion Labs</span>
+    <span class="sep"></span>
+    <a href="https://arvion-technology.github.io/labs/">All projects</a>
+    <span class="sep"></span>
+    <a href="https://github.com/arvion-technology/whiteboard" target="_blank" rel="noopener">source</a>
+  </div>
+
+  <script src="arvion.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
