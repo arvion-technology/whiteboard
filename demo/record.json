@@ -1,0 +1,21 @@
+[
+  { "wait": 900 },
+  { "click": "[data-tool=\"sticky\"]" },
+  { "wait": 250 },
+  { "drag": [900, 650, 1050, 770] },
+  { "wait": 450 },
+  { "drag": [900, 650, 940, 690] },
+  { "wait": 450 },
+  { "drag": [995, 720, 1040, 650] },
+  { "wait": 450 },
+  { "click": "[data-tool=\"connector\"]" },
+  { "wait": 300 },
+  { "eval": "(() => { const a = __canvas.centerOf('sprint-fraud'); __canvas.click(a[0], a[1]); const b = __canvas.centerOf('sprint-retry'); __canvas.click(b[0], b[1]); })()" },
+  { "wait": 650 },
+  { "click": "[data-tool=\"select\"]" },
+  { "wait": 300 },
+  { "click": "#zoom-in" },
+  { "wait": 650 },
+  { "click": "#zoom-fit" },
+  { "wait": 1000 }
+]
