@@ -1,4 +1,4 @@
-// Canvas demo — rendering, input and UI.
+// Canvas demo, rendering, input and UI.
 //
 // All board logic lives in ../src and is imported here unchanged; this file owns
 // only the canvas renderer, pointer/keyboard handling and DOM chrome. The same
@@ -1434,10 +1434,10 @@ function selectionInspectorHTML(info) {
       <span class="badge gold">${escapeHtml(badge)}</span>
     </div>
     <div class="prop-grid">
-      <div><span>X</span><b>${box ? Math.round(box.x) : "—"}</b></div>
-      <div><span>Y</span><b>${box ? Math.round(box.y) : "—"}</b></div>
-      <div><span>W</span><b>${box ? Math.round(box.w) : "—"}</b></div>
-      <div><span>H</span><b>${box ? Math.round(box.h) : "—"}</b></div>
+      <div><span>X</span><b>${box ? Math.round(box.x) : ", "}</b></div>
+      <div><span>Y</span><b>${box ? Math.round(box.y) : ", "}</b></div>
+      <div><span>W</span><b>${box ? Math.round(box.w) : ", "}</b></div>
+      <div><span>H</span><b>${box ? Math.round(box.h) : ", "}</b></div>
     </div>
     ${sticky ? `<div class="swatches">${STICKY_COLOR_KEYS.map((key) => {
       const palette = stickyColor({ color: key });

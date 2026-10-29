@@ -2,7 +2,7 @@
 <img src="docs/demo.gif" alt="Canvas whiteboard demo: drawing a sticky note, resizing it, moving it, connecting two notes and zooming" width="100%" />
 </div>
 
-<sub>Recorded from the live demo — <a href="docs/demo.mp4">MP4</a> · <a href="docs/screenshot.png">static frame</a></sub>
+<sub>Recorded from the live demo, <a href="docs/demo.mp4">MP4</a> · <a href="docs/screenshot.png">static frame</a></sub>
 
 # Canvas
 
